@@ -11,6 +11,8 @@ cd /opt/docker
 
 git clone https://github.com/sodawave/wirehole-compose.git
 
+cp .env_example .env
+
 
 sudo systemctl daemon-reload
 sudo systemctl enable docker.service
