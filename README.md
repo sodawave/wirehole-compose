@@ -1,7 +1,8 @@
 # wirehole-compose
+
 install wireguard + pihole
 
-
+'''
 sudo apt update && sudo apt install docker.io docker-compose -y
 
 
@@ -21,3 +22,4 @@ sudo systemctl stop systemd-resolved
 
 sudo sed -i '/nameserver 127.0.0.53/a nameserver 8.8.8.8' /etc/resolv.conf
 sudo sed -i '/nameserver 127.0.0.53/a nameserver 8.8.4.4' /etc/resolv.conf
+'''
