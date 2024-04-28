@@ -6,8 +6,10 @@ install wireguard + pihole
 sudo apt update && sudo apt install docker.io docker-compose -y
 
 
-sudo mkdir -p /opt/docker/wireguard-pihole
-cd /opt/docker/wireguard-pihole
+sudo mkdir -p /opt/docker
+cd /opt/docker
+
+git clone https://github.com/sodawave/wirehole-compose.git
 
 
 sudo systemctl daemon-reload
