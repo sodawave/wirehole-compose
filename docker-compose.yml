@@ -1,0 +1,92 @@
+version: '3.7'
+
+volumes:
+  etc_wireguard:
+
+services:
+  wg-easy:
+    environment:
+      # Change Language:
+      # (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi)
+      - LANG=en
+      # ⚠️ Required:
+      # Change this to your host's public address
+      - WG_HOST=[YOUR IP OR DOMAIN]
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Tallinn
+      # - SERVERURL= #optional ip or domain of your server
+      - SERVERPORT=51820 #optional
+      - PEERS=10 #optional
+      - PEERDNS=auto #optional
+      - INTERNAL_SUBNET=10.13.13.0 #optional
+      # Optional:
+      - PASSWORD=foobar123
+      # - PORT=51821
+      # - WG_PORT=51820
+      # - WG_DEFAULT_ADDRESS=10.8.0.x
+      # - WG_DEFAULT_DNS=1.1.1.1
+      # - WG_MTU=1420
+      # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24
+      # - WG_PERSISTENT_KEEPALIVE=25
+      # - WG_PRE_UP=echo "Pre Up" > /etc/wireguard/pre-up.txt
+      # - WG_POST_UP=echo "Post Up" > /etc/wireguard/post-up.txt
+      # - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
+      # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
+      # - UI_TRAFFIC_STATS=true
+      # - UI_CHART_TYPE=0 # (0 Charts disabled, 1 # Line chart, 2 # Area chart, 3 # Bar chart)
+
+    image: ghcr.io/wg-easy/wg-easy
+    container_name: wg-easy
+    volumes:
+      - /opt/docker/wireguard-pihole/wireguard/config:/config
+      - /lib/modules:/lib/modules
+      - /usr/src:/usr/src
+
+    ports:
+      - "51820:51820/udp"
+      - "5000:51821/tcp"
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    dns:
+      - 172.20.0.7
+    networks:
+      containers:
+        ipv4_address: 172.20.0.6    
+
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    dns:
+      - "127.0.0.1"
+      - "1.1.1.1"
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "80:80/tcp"
+      - "443:443/tcp"
+    environment:
+      TZ: 'Europe/Tallinn'
+      WEBPASSWORD: foobar123
+    volumes:
+      - '/opt/docker/wireguard-pihole/pihole/etc/pihole/:/etc/pihole/'
+      - '/opt/docker/wireguard-pihole/pihole/etc/dnsmasq.d/:/etc/dnsmasq.d/'
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+    networks:
+      containers:
+        ipv4_address: 172.20.0.7
+
+networks:
+  containers:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
