@@ -8,20 +8,21 @@ services:
     environment:
       # Change Language:
       # (Supports: en, ua, ru, tr, no, pl, fr, de, ca, es, ko, vi, nl, is, pt, chs, cht, it, th, hi)
-      - LANG=en
+      - LANG=${LANG}
       # ⚠️ Required:
       # Change this to your host's public address
-      - WG_HOST=[YOUR IP OR DOMAIN]
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Tallinn
+      - WG_HOST=${WG_HOST}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIMEZONE}
+
       # - SERVERURL= #optional ip or domain of your server
       - SERVERPORT=51820 #optional
-      - PEERS=10 #optional
+      - PEERS=${WIREGUARD_PEERS} #optional
       - PEERDNS=auto #optional
-      - INTERNAL_SUBNET=10.13.13.0 #optional
+      - INTERNAL_SUBNET=${INTERNAL_SUBNET} #optional
       # Optional:
-      - PASSWORD=foobar123
+      - PASSWORD=${WIREGUARD_PASSWORD}
       # - PORT=51821
       # - WG_PORT=51820
       # - WG_DEFAULT_ADDRESS=10.8.0.x
@@ -42,7 +43,6 @@ services:
       - /opt/docker/wirehole-compose/wireguard/config:/config
       - /lib/modules:/lib/modules
       - /usr/src:/usr/src
-
     ports:
       - "51820:51820/udp"
       - "5000:51821/tcp"
@@ -54,11 +54,11 @@ services:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
     dns:
-      - 172.20.0.7
+      - ${WIREGUARD_PEER_DNS}
     networks:
       containers:
-        ipv4_address: 172.20.0.6    
-
+        ipv4_address: ${WIREGUARD_IPV4_ADDRESS}
+    env_file: ./.env
 
   pihole:
     container_name: pihole
@@ -73,8 +73,8 @@ services:
       - "80:80/tcp"
       - "443:443/tcp"
     environment:
-      TZ: 'Europe/Tallinn'
-      WEBPASSWORD: foobar123
+      TZ: ${TIMEZONE}
+      WEBPASSWORD: ${PIHOLE_PASSWORD}
     volumes:
       - '/opt/docker/wirehole-compose/pihole/etc/pihole/:/etc/pihole/'
       - '/opt/docker/wirehole-compose/pihole/etc/dnsmasq.d/:/etc/dnsmasq.d/'
@@ -83,10 +83,11 @@ services:
     restart: unless-stopped
     networks:
       containers:
-        ipv4_address: 172.20.0.7
+        ipv4_address: ${PIHOLE_IPV4_ADDRESS}
+    env_file: ./.env
 
 networks:
   containers:
     ipam:
       config:
-        - subnet: 172.20.0.0/24
+        - subnet: ${SUBNET}
