@@ -39,7 +39,7 @@ services:
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
     volumes:
-      - /opt/docker/wireguard-pihole/wireguard/config:/config
+      - /opt/docker/wirehole-compose/wireguard/config:/config
       - /lib/modules:/lib/modules
       - /usr/src:/usr/src
 
@@ -76,8 +76,8 @@ services:
       TZ: 'Europe/Tallinn'
       WEBPASSWORD: foobar123
     volumes:
-      - '/opt/docker/wireguard-pihole/pihole/etc/pihole/:/etc/pihole/'
-      - '/opt/docker/wireguard-pihole/pihole/etc/dnsmasq.d/:/etc/dnsmasq.d/'
+      - '/opt/docker/wirehole-compose/pihole/etc/pihole/:/etc/pihole/'
+      - '/opt/docker/wirehole-compose/pihole/etc/dnsmasq.d/:/etc/dnsmasq.d/'
     cap_add:
       - NET_ADMIN
     restart: unless-stopped
